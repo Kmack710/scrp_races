@@ -14,3 +14,7 @@ If you are not using double job you have to replace every "job2" to "job"
 3. Create lobby
 4. Start race
 5. Have Fun!!!!
+
+# Showcase: 
+
+Video: https://www.youtube.com/watch?v=imBrVTHyQYw&feature=youtu.be
