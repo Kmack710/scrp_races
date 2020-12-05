@@ -2,7 +2,7 @@
 fx_version 'bodacious'
 game 'gta5'
 
-author 'Sergio Lopez'
+author 'Scorpion08'
 description 'Carreras organizadas por una mafia'
 version '1.0.0'
 
