@@ -3,7 +3,7 @@ fx_version 'bodacious'
 game 'gta5'
 
 author 'Scorpion08'
-description 'Carreras organizadas por una mafia'
+description 'Races organized by a mafia'
 version '1.0.0'
 
 client_scripts {

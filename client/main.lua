@@ -16,23 +16,23 @@ Citizen.CreateThread(function()
 		Citizen.Wait(0)
 	end
 
-	while ESX.GetPlayerData().job2 == nil do
+	while ESX.GetPlayerData().job == nil do
         Citizen.Wait(10)
 	end
 
 	ESX.PlayerData = ESX.GetPlayerData()
 end)
 
-RegisterNetEvent('esx:setJob2')
-AddEventHandler('esx:setJob2', function(job2)
-    local lastjob2 = ESX.PlayerData.job2.name
-    ESX.PlayerData.job2 = job2
-    if job2.name ~= "mafiarace" then
+RegisterNetEvent('esx:setJob')
+AddEventHandler('esx:setJob', function(job)
+    local lastjob = ESX.PlayerData.job.name
+    ESX.PlayerData.job = job
+    if job.name ~= "mafiarace" then
         for k,v in pairs(blips) do
             RemoveBlip(v)
         end
         blips = {}
-    elseif lastjob2 ~= job2.name then
+    elseif lastjob ~= job.name then
         for k,v in pairs(races) do
             blips[k] = AddBlipForCoord(v.checkpoints[1].x, v.checkpoints[1].y, v.checkpoints[1].z)
             
@@ -79,7 +79,7 @@ AddEventHandler("mafiaracing:updateRacesClient", function(r)
         if v.used == 0 then
             TriggerEvent("mafiaracing:createLobbyClient", k)
         end
-        if ESX.PlayerData.job2 and ESX.PlayerData.job2.name == "mafiarace" then
+        if ESX.PlayerData.job and ESX.PlayerData.job.name == "mafiarace" then
             blips[k] = AddBlipForCoord(v.checkpoints[1].x, v.checkpoints[1].y, v.checkpoints[1].z)
             
             SetBlipSprite (blips[k], 38)
@@ -133,7 +133,7 @@ RegisterNetEvent("mafiaracing:updateRaceState")
 AddEventHandler("mafiaracing:updateRaceState", function(race, used)
     if races[race] then
         races[race].used = used
-        if ESX.PlayerData.job2 and ESX.PlayerData.job2.name == "mafiarace" then
+        if ESX.PlayerData.job and ESX.PlayerData.job.name == "mafiarace" then
             SetBlipColour(blips[race], SelectBlipColour(races[race].used))
         end
     end
@@ -142,17 +142,17 @@ end)
 -- comprobar si hay que terminar la carrera
 function CheckEndRace(vehicle, distance, race)
     if (distance > Config.DistanceToEnd) then
-        ESX.ShowNotification("Se te ha expulsado de la carrera por alejarte demasiado.")
+        ESX.ShowNotification("You have been kicked out of the race for straying too far.")
         TriggerServerEvent("mafiaracing:removeFromRace", GetPlayerServerId(PlayerId()), race)
         return true
     end
     if (vehicle == 0) then
-        ESX.ShowNotification("Se te ha expulsado de la carrera por bajar del coche.")
+        ESX.ShowNotification("You have been kicked out of the race for getting out of the car.")
         TriggerServerEvent("mafiaracing:removeFromRace", GetPlayerServerId(PlayerId()), race)
         return true
     end
     if (GetEntityHealth(PlayerPedId()) <= 0) then
-        ESX.ShowNotification("Se te ha expulsado de la carrera al haber muerto.")
+        ESX.ShowNotification("You have been expelled from the race because you died.")
         TriggerServerEvent("mafiaracing:removeFromRace", GetPlayerServerId(PlayerId()), race)
         return true
     end
@@ -210,7 +210,7 @@ AddEventHandler("mafiaracing:giveLeaderboard", function(race, runners, drivenout
     end
 end)
 
--- devuelve true si el jugador está dentro del área (aprox) y está en un coche en el asiento principal
+-- returns true if the player is within the area (approx) and is in a car in the main seat
 function CanRace(race)
     local vehicle = GetVehiclePedIsIn(PlayerPedId())
     if (vehicle == 0) then
@@ -421,11 +421,11 @@ end
 
 function OpenUseRace()
     elements = {
-        {label = "Crear lobby"},
-        {label = "Cerrar lobby"},
-        {label = "Empezar carrera"},
-        {label = "Terminar carrera"},
-        {label = "Clasificación última carrera"}
+        {label = "Create a lobby"},
+        {label = "Close lobby"},
+        {label = "Start Race"},
+        {label = "Finish Race"},
+        {label = "Last race stats"}
     }
 
 	ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'mafiarace_userace', {
@@ -435,27 +435,27 @@ function OpenUseRace()
 	}, function(data, menu)
 
         if races[selected] then
-            if data.current.label == "Crear lobby" then
+            if data.current.label == "Create a lobby" then
                 TriggerServerEvent("mafiaracing:createLobbyServer", GetPlayerServerId(PlayerId()), selected)
-            elseif data.current.label == "Cerrar lobby" then
+            elseif data.current.label == "Close lobby" then
                 TriggerServerEvent("mafiaracing:closeLobbyServer", GetPlayerServerId(PlayerId()), selected)
-            elseif data.current.label == "Empezar carrera" then
+            elseif data.current.label == "Start Race" then
                 TriggerServerEvent("mafiaracing:startRaceServer", GetPlayerServerId(PlayerId()), selected)
-            elseif data.current.label == "Terminar carrera" then
+            elseif data.current.label == "Finish Race" then
                 TriggerServerEvent("mafiaracing:endRaceServer", GetPlayerServerId(PlayerId()), selected)
             else
                 if races[selected].runners then
                     if races[selected].used ~= 1 then
                         OpenRankingRace()
                     else
-                        ESX.ShowNotification("~r~Hay una carrera activa.")
+                        ESX.ShowNotification("~r~There is an active career.")
                     end
                 else
-                    ESX.ShowNotification("~r~La clasificación esta vacía.")
+                    ESX.ShowNotification("~r~The classification is empty.")
                 end
             end
         else
-            ESX.ShowNotification("~r~Esta carrera ya no existe.")
+            ESX.ShowNotification("~r~This race no longer exists.")
         end
 
 	end, function(data, menu)
@@ -466,7 +466,7 @@ end
 RegisterNetEvent("mafiaracing:updateRaceClient")
 AddEventHandler("mafiaracing:updateRaceClient", function(race, content)
     races[race] = content
-    if ESX.PlayerData.job2 and ESX.PlayerData.job2.name == "mafiarace" then
+    if ESX.PlayerData.job and ESX.PlayerData.job.name == "mafiarace" then
         RemoveBlip(blips[race])
         if content ~= nil then
             blips[race] = AddBlipForCoord(races[race].checkpoints[1].x, races[race].checkpoints[1].y, races[race].checkpoints[1].z)
@@ -491,14 +491,14 @@ function OpenAreYouSure()
     }
 
 	ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'mafiarace_areyousure', {
-		title    = '¿Seguro que quieres eliminar ' .. selected .. '?',
+		title    = 'Are you sure you want to delete ' .. selected .. '?',
 		align    = 'top-left',
 		elements = elements
     }, function(data, menu)
         
         if data.current.label == "Si" then
             TriggerServerEvent("mafiaracing:updateRaceServer", selected, nil)
-            ESX.ShowNotification("~g~Has eliminado la carrera ~b~" .. selected .. "~g~.")
+            ESX.ShowNotification("~g~You have been eliminated from the race ~b~" .. selected .. "~g~.")
         else
             menu.close()
         end
@@ -510,20 +510,20 @@ end
 
 function OpenEditRace()
     local elements = {
-		{label = "Añadir punto"},
-        {label = "Quitar el último punto"},
-        {label = "Guardar cambios"},
-        {label = "Eliminar carrera"}
+		{label = "Add point"},
+        {label = "Remove the last point"},
+        {label = "Save Changes"},
+        {label = "Delete race"}
     }
 
 	ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'mafiarace_editrace', {
-		title    = 'Editor de carrera',
+		title    = 'Edit Race',
 		align    = 'top-left',
 		elements = elements
     }, function(data, menu)
         
         if races[selected] then
-            if data.current.label == "Añadir punto" then
+            if data.current.label == "Add point" then
                 table.insert(races[selected].checkpoints, GetEntityCoords(PlayerPedId()))
                 if #races[selected].checkpoints == 1 then
                     blips[selected] = AddBlipForCoord(races[selected].checkpoints[1].x, races[selected].checkpoints[1].y, races[selected].checkpoints[1].z)
@@ -538,28 +538,28 @@ function OpenEditRace()
                     AddTextComponentString(selected)
                     EndTextCommandSetBlipName(blips[selected])
                 end
-                ESX.ShowNotification("~g~Has añadido un punto a ~b~" .. selected .. "~g~.")
+                ESX.ShowNotification("~g~You have added a point to~b~" .. selected .. "~g~.")
                 PlaySoundFrontend(-1, "CHECKPOINT_AHEAD", "HUD_MINI_GAME_SOUNDSET")
-            elseif data.current.label == "Quitar el último punto" then
+            elseif data.current.label == "Remove the last point" then
                 if #races[selected].checkpoints > 0 then
                     if #races[selected].checkpoints == 1 then
-                        ESX.ShowNotification("~g~Ya no quedan más checkpoints.")
+                        ESX.ShowNotification("~g~There are no more checkpoints left.")
                         RemoveBlip(blips[selected])
                     end
                     table.remove(races[selected].checkpoints, #races[selected].checkpoints)
-                    ESX.ShowNotification("~g~Has eliminado un punto de ~b~" .. selected .. "~g~.")
+                    ESX.ShowNotification("~g~You have removed a point from~b~" .. selected .. "~g~.")
                     PlaySoundFrontend(-1, "RACE_PLACED", "HUD_AWARDS")
                 else
-                    ESX.ShowNotification("~r~No hay ningún punto que quitar.")
+                    ESX.ShowNotification("~r~There is no point to remove.")
                 end
-            elseif data.current.label == "Guardar cambios" then
+            elseif data.current.label == "Save Changes" then
                 TriggerServerEvent("mafiaracing:updateRaceServer", selected, races[selected], GetPlayerServerId(PlayerId()))
-                ESX.ShowNotification("~g~Guardando los cambios de la carrera ~b~" .. selected .. "~g~...")
+                ESX.ShowNotification("~g~Saving career changes~b~" .. selected .. "~g~...")
             else
                 OpenAreYouSure()
             end     
         else
-            ESX.ShowNotification("~r~Esta carrera ya no existe.")
+            ESX.ShowNotification("~r~This race no longer exists.")
         end
 
 	end, function(data, menu)
@@ -579,7 +579,7 @@ function OpenExistingRaces()
     end
 
 	ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'mafiarace_existingrace', {
-		title    = 'Selecciona una carrera',
+		title    = 'Select a street',
 		align    = 'top-left',
 		elements = elements
 	}, function(data, menu)
@@ -592,11 +592,11 @@ function OpenExistingRaces()
                     TriggerServerEvent("mafiaracing:usedState", selected, 2)
                     OpenEditRace()
                 else
-                    ESX.ShowNotification("~r~La carrera está siendo utilizada.")
+                    ESX.ShowNotification("~r~The race is being used.")
                 end
             end
         else
-            ESX.ShowNotification("~r~Esta carrera ya no está disponible.")
+            ESX.ShowNotification("~r~This race is no longer available.")
         end
 	end, function(data, menu)
 		menu.close()
@@ -605,17 +605,17 @@ end
 
 function OpenSelectExistingOrNew()
     local elements = {
-		{label = "Editar una carrera existente"},
-		{label = "Crear una nueva carrera"}
+		{label = "Edit an existing race"},
+		{label = "Create a new race"}
     }
 
 	ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'mafiarace_existingornew', {
-		title    = 'Selecciona una opción',
+		title    = 'Select an option',
 		align    = 'top-left',
 		elements = elements
     }, function(data, menu)
         
-        if data.current.label == "Editar una carrera existente" then
+        if data.current.label == "Edit an existing race" then
             OpenExistingRaces()
         else
             DisplayOnscreenKeyboard(false, "FMMC_KEY_TIP8", "", "", "", "", "", 64)
@@ -630,10 +630,10 @@ function OpenSelectExistingOrNew()
                             local inputText = GetOnscreenKeyboardResult()
                             if string.len(inputText) > 0 then
                                 if string.len(inputText) > 30 then
-                                    ESX.ShowNotification("~r~El nombre es demasiado grande. (máximo 30 caracteres)")
+                                    ESX.ShowNotification("~r~The name is too big. (maximum 30 characters)")
                                 else
                                     if races[inputText] ~= nil then
-                                        ESX.ShowNotification("~r~Ese nombre ya está en uso")
+                                        ESX.ShowNotification("~r~That name is already in use")
                                     else
                                         local playercoords = GetEntityCoords(PlayerPedId())
                                         races[inputText] = {
@@ -642,7 +642,7 @@ function OpenSelectExistingOrNew()
                                             }
                                         }
                                         TriggerServerEvent("mafiaracing:updateRaceServer", inputText, races[inputText])
-                                        ESX.ShowNotification("~g~Has creado una carrera con el primer checkpoint en tu posición actual.")
+                                        ESX.ShowNotification("~g~You have created a race with the first checkpoint at your current position.")
                                     end
                                 end
                                 input = false
@@ -665,19 +665,19 @@ end
 
 function OpenMafiaRaceMenu()
 	local elements = {
-		{label = "Gestionar una carrera"},
-		{label = "Editor de carreras"}
+		{label = "Manage a race"},
+		{label = "Race Editor"}
     }
 
 	ESX.UI.Menu.CloseAll()
 
 	ESX.UI.Menu.Open('default', GetCurrentResourceName(), 'mafiarace_actions', {
-		title    = 'Mafia de carreras',
+		title    = 'Racing Mafia',
 		align    = 'top-left',
 		elements = elements
 	}, function(data, menu)
 
-        if data.current.label == "Gestionar una carrera" then
+        if data.current.label == "Manage a race" then
             editing = 0
 			OpenExistingRaces()
         else
@@ -694,7 +694,7 @@ end
 Citizen.CreateThread(function()
 	while true do
 		Citizen.Wait(0)
-        if IsControlJustReleased(1, 57) and ESX.PlayerData.job2 and ESX.PlayerData.job2.name == "mafiarace" then
+        if IsControlJustReleased(1, 57) and ESX.PlayerData.job and ESX.PlayerData.job.name == "mafiarace" then
             OpenMafiaRaceMenu()
         end
 	end

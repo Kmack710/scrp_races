@@ -50,15 +50,15 @@ AddEventHandler("mafiaracing:createLobbyServer", function(src, race)
                 races[race].used = 0
                 TriggerClientEvent("mafiaracing:updateRaceState", -1, race, 0)
                 TriggerClientEvent("mafiaracing:createLobbyClient", -1, race)
-                TriggerClientEvent("mafiaracing:serverMessage", src, "~g~Has creado un lobby para la carrera ~b~".. race .."~g~.")    
+                TriggerClientEvent("mafiaracing:serverMessage", src, "~g~You have created a lobby for the race ~b~".. race .."~g~.")    
             else
-                TriggerClientEvent("mafiaracing:serverMessage", src, "~r~Se necesitan al menos 2 checkpoints.")   
+                TriggerClientEvent("mafiaracing:serverMessage", src, "~r~At least 2 checkpoints are required.")   
             end
         else
-            TriggerClientEvent("mafiaracing:serverMessage", src, "~r~Ya está siendo utilizada la carrera.")
+            TriggerClientEvent("mafiaracing:serverMessage", src, "~r~The race is already being used.")
         end
     else
-        TriggerClientEvent("mafiaracing:serverMessage", src, "~r~Esta carrera no existe.")
+        TriggerClientEvent("mafiaracing:serverMessage", src, "~r~This race does not exist.")
     end
 end)
 
@@ -67,9 +67,9 @@ AddEventHandler("mafiaracing:closeLobbyServer", function(src, race)
     if races[race].used == 0 then
         races[race].used = nil
         TriggerClientEvent("mafiaracing:updateRaceState", -1, race, nil)
-        TriggerClientEvent("mafiaracing:serverMessage", src, "~g~Has cerrado el lobby de la carrera ~b~".. race .."~g~.")
+        TriggerClientEvent("mafiaracing:serverMessage", src, "~g~You have closed the race lobby~b~".. race .."~g~.")
     else
-        TriggerClientEvent("mafiaracing:serverMessage", src, "~r~No hay ningún lobby creado.")
+        TriggerClientEvent("mafiaracing:serverMessage", src, "~r~There is no lobby created.")
     end
 end)
 
@@ -86,16 +86,16 @@ AddEventHandler("mafiaracing:startRaceServer", function(src, race)
         if #races[race].runners == 0 then
             races[race].used = nil
             TriggerClientEvent("mafiaracing:updateRaceState", -1, race, nil)
-            TriggerClientEvent("mafiaracing:serverMessage", src, "~r~No se ha detectado ningún jugador en el lobby.")
+            TriggerClientEvent("mafiaracing:serverMessage", src, "~r~No player has been detected in the lobby.")
         else
             TriggerClientEvent("mafiaracing:giveLeaderboard", -1, race, races[race].runners, races[race].drivenout)
-            TriggerClientEvent("mafiaracing:serverMessage", src, "~g~Has empezado la carrera ~b~".. race .."~g~.")
+            TriggerClientEvent("mafiaracing:serverMessage", src, "~g~You have started the race~b~".. race .."~g~.")
             Wait(4000)
             races[race].runners = {}
             races[race].drivenout = {}
         end
     else
-        TriggerClientEvent("mafiaracing:serverMessage", src, "~r~No hay ningún lobby creado.")
+        TriggerClientEvent("mafiaracing:serverMessage", src, "~r~There is no lobby created.")
     end    
 end)
 
@@ -104,9 +104,9 @@ AddEventHandler("mafiaracing:endRaceServer", function(src, race)
     if races[race].used == 1 then
         races[race].used = nil
         TriggerClientEvent("mafiaracing:updateRaceState", -1, race, nil)
-        TriggerClientEvent("mafiaracing:serverMessage", src, "~g~Has terminado la carrera ~b~".. race .."~g~.")
+        TriggerClientEvent("mafiaracing:serverMessage", src, "~g~You finished the race~b~".. race .."~g~.")
     else
-        TriggerClientEvent("mafiaracing:serverMessage", src, "~r~No está la carrera activa.")
+        TriggerClientEvent("mafiaracing:serverMessage", src, "~r~There is no active race.")
     end
 end)
 
@@ -222,7 +222,7 @@ AddEventHandler("mafiaracing:updateRaceServer", function(race, content, src)
                     MySQL.Async.execute(query, values,
                     function()
                         if src then
-                            TriggerClientEvent("mafiaracing:serverMessage", src, "~g~Se ha guardado la carrera correctamente.")
+                            TriggerClientEvent("mafiaracing:serverMessage", src, "~g~The race has been saved successfully.")
                         end
                         TriggerClientEvent("mafiaracing:updateRaceClient", -1, race, content)
                     end)

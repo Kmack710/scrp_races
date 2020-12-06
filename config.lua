@@ -2,17 +2,17 @@ Config = {}
 
 --#### CONFIGURACIÓN DE MAFIARACING ####--
 
--- Distancia entre el coche y el checkpoint para que cuente por válido
+-- Distance between the car and the checkpoint to count as valid
 Config.DistanteToValid = 10
 
--- Distancia al checkpoint para que el jugador sea expulsado
+-- Distance to the checkpoint for the player to be sent off
 Config.DistanceToEnd = 600
 
--- Distancia a la salida para entrar como corredor
+-- Distance to the start to enter as a runner
 Config.DistanteFromRaceStart = 40
 
--- Anchura de la parrilla de salida
+-- Starting grid width
 Config.RaceStartWidth = 15
 
--- Delay entre actualizaciones de la clasificación (en milisegundos)
-Config.TimeToSendInfo = 100
+-- Delay between ranking updates (in milliseconds)
+Config.TimeToSendInfo = 500
